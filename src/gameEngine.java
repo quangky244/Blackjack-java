@@ -390,15 +390,21 @@ public class gameEngine {
 			}
 			System.out.println(i);
 		}
-		if (playerList.get(i).sum() < host.sum()) {
+		if ((playerList.get(i).sum() < host.sum()  && !host.isBusted())|| playerList.get(i).isBusted()||(host.isBlackjack() && !playerList.get(i).isBlackjack()) ) {
 			return 1; //host win
 		}
-		else if (playerList.get(i).sum() == host.sum()) {
-			playerList.get(i).setChase();
+		else if ((playerList.get(i).sum() == host.sum() && !playerList.get(i).isBusted()) ||(host.isBlackjack() && playerList.get(i).isBlackjack()) ) {
+			playerList.get(i).setChase(); 
 			return 2; //draw
 		}
-		else {
-			playerList.get(i).setWin();
+		else if((!host.isBlackjack() && playerList.get(i).isBlackjack())) {
+			playerList.get(i).setWin() ;
+			return 0;
+		}
+		else 
+//		if (playerList.get(i).sum() > host.sum() && !playerList.get(i).isBusted()) 
+		{
+			playerList.get(i).setWin() ;
 			return 0;//host lose
 		}
 	}

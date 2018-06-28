@@ -146,10 +146,11 @@ public class gameRunner {
 			}	
 		}
 		
-		System.out.println("Host is busted");
+		
 		
 		scn.close();
 		if (host.isBusted()) {
+			System.out.println("Host is busted");
 			game.bustedPay();
 		}
 		Request req4;

@@ -9,6 +9,7 @@ public class Player {
 	public boolean win=false;
 	public boolean chase = false;
 	public boolean busted=false;
+	public boolean blackjack=false;
 	private boolean checked = false;
 	
 	Player(Player p){
@@ -18,6 +19,21 @@ public class Player {
 	}
 	
 	public List<String> holdingCards = new Vector<String>();
+	
+	
+	public boolean isBlackjack() {
+		boolean halfjack=false;
+		boolean halfblack=false;
+		for (int i = 0; i< 2;i++) {
+			if ((extractPoint(holdingCards.get(i)) == 1)) {
+				halfblack = true;
+			} else if ((extractPoint(holdingCards.get(i)) == 10)) {
+				halfjack = true;
+			}
+		}
+		if (halfblack && halfjack) return true;
+		else return false;
+	}
 	public String[] getFirstDealedCard() {
 		String[] karte = new String[2];
 		karte[0] = holdingCards.get(0);
