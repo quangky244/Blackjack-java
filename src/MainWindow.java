@@ -12,6 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,6 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -28,9 +32,11 @@ public class MainWindow extends Application{
 	Button button;
 	static Stage window;
 	static Scene loginScene,roomScene, gameScene;
-	static String username;
-	static String room[] = {"room1","RoOm2", "ROOM3"};
+	static String username = "hellokitty";
+	static String password = "hithere";
+	static String room[] = {"room1 - BlueCap - 2","RoOm2 - CrystalTiger - 1", "ROOM3 - RedVelvet - 0"};
 	static ListView<String> roomList;
+	static TableView<String> roomTable;
 	static String players[]= {"BlackAvocado","GreenLantern","AngryBird"};
 	static String cards[]= {"2S","AC","JH","10D","KD"};
 //	static Collection<Image> imageList;
@@ -49,8 +55,7 @@ public class MainWindow extends Application{
 		window.setWidth(700);
 		window.setHeight(350);
 		
-		loginScene = setLoginScene();
-//		gameScene=setGameScene();
+		loginScene = setLoginScene(false);
 		window.setScene(loginScene);
 		window.show();
 		
@@ -59,7 +64,7 @@ public class MainWindow extends Application{
 		System.out.println("Username from main: "+username);
 	}
 	
-	static Scene setLoginScene() {
+	static Scene setLoginScene(boolean wrongSomething) {
 		
 		GridPane grid = new GridPane();
 		grid.setPadding(new Insets(10,10,10,10));
@@ -67,28 +72,56 @@ public class MainWindow extends Application{
 		grid.setHgap(10);
 		
 		//NameLabel
-		Label nameLabel = new Label("Choose a username: ");
+		Label Label = new Label("Sign in");
+//		GridPane.setConstraints(nameLabel, 0,0);
+		
+		Label nameLabel = new Label("Username: ");
 		GridPane.setConstraints(nameLabel, 0,0);
+		
+		//PasswordLabel
+		Label passLabel = new Label("Password: ");
+		GridPane.setConstraints(passLabel, 0,1);
+		
+		Label wrongAlert = new Label("Wrong username or password!");
+		wrongAlert.setTextFill(Color.web("#ff0000"));
+		wrongAlert.setVisible(wrongSomething);
 				
 		//Username Input
 		TextField nameInput = new TextField();
 		nameInput.setMinWidth(150);
 		nameInput.setMaxWidth(150);
-		GridPane.setConstraints(nameInput, 0, 1);
-				
+		nameInput.setPromptText("username");
+		nameInput.setText(username);
+		GridPane.setConstraints(nameInput, 1, 0);
+		
+		PasswordField passField = new PasswordField();
+		passField.setMinWidth(150);
+		passField.setMaxWidth(150);
+		passField.setText(password);
+		passField.setPromptText("password");
+		GridPane.setConstraints(passField, 1, 1);
+		
 		//Button
 		Button signinButton = new Button("Sign in!");
-		GridPane.setConstraints(signinButton,1,1);
+//		GridPane.setConstraints(signinButton,1,1);
 		signinButton.setOnAction(e -> {
-			username = nameInput.getText();
-			System.out.println(nameInput.getText());
-			changeToRoomScene();
+			String input= nameInput.getText();
+			String pass = passField.getText();
+			
+			if (input.equals(username)&&pass.equals(password)) {
+				changeToRoomScene();
+				System.out.println("Correct username & password");
+			} else {
+				loginScene = setLoginScene(true);
+				window.setScene(loginScene);
+				System.out.println("Inorrect username or password");
+			}
 		});
-		
-//		grid.getChildren().addAll(nameLabel, nameInput, signinButton);
+		grid.setAlignment(Pos.CENTER);
+		grid.getChildren().addAll(nameLabel, nameInput, passLabel, passField);
 		VBox loginBox = new VBox(20);
 		loginBox.setAlignment(Pos.CENTER);
-		loginBox.getChildren().addAll(nameLabel, nameInput, signinButton);
+		loginBox.getChildren().addAll(Label, grid, signinButton,wrongAlert);
 		Scene scene = new Scene(loginBox);
 		return scene;
 	}
@@ -99,6 +132,7 @@ public class MainWindow extends Application{
 	}
 	
 	
+//	@SuppressWarnings("unchecked")
 	static Scene setRoomScene() {
 		GridPane grid = new GridPane();
 		grid.setPadding(new Insets(10,10,10,10));
@@ -115,6 +149,19 @@ public class MainWindow extends Application{
 		roomList.getItems().addAll(room); 
 		GridPane.setConstraints(roomList,0,1);
 		
+		roomTable = new TableView<String>();
+		
+//		TableColumn<String, String> roomNameCol = new TableColumn<String, String>("Room Name");
+//		TableColumn<String, String> hostNameCol = new TableColumn<String, String>("Host User");
+//		TableColumn<String, String> numPlayerCol = new TableColumn<String, String>("Number of Players");
+//		
+//		TableColumn roomNameCol = new TableColumn("Room Name");
+//	    TableColumn hostNameCol = new TableColumn("Host User");
+//	    TableColumn numPlayerCol = new TableColumn("Number of Players");
+//		
+//        roomTable.getColumns().addAll(roomNameCol, hostNameCol, numPlayerCol);
+//        GridPane.setConstraints(roomTable,0,1);
+        
 		//Button
 		Button joinRoomButton = new Button("Join room!");
 		GridPane.setConstraints(joinRoomButton,2,0);
@@ -132,8 +179,15 @@ public class MainWindow extends Application{
 			String roomName = createRoomBox.display();
 			System.out.println(roomName);
 		});
+		Button logoutButton = new Button("Logout");
+		GridPane.setConstraints(logoutButton,4,0);
+		logoutButton.setOnAction(e->{
+			loginScene = setLoginScene(false);
+			window.setScene(loginScene);
+			System.out.println("Logged Out");
+		});
 		
-		grid.getChildren().addAll(nameLabel, roomList , joinRoomButton, createRoomButton);
+		grid.getChildren().addAll(nameLabel, roomList , joinRoomButton, createRoomButton,logoutButton);
 		Scene scene = new Scene(grid);
 		return scene;
 	}
@@ -155,6 +209,7 @@ public class MainWindow extends Application{
 		Label player2lab = new Label("Player2: "+players[1]);
 		Label player3lab = new Label("Player3: "+players[2]);
 		topmenu.getChildren().addAll(hostLab,player1lab,player2lab,player3lab);
+		
 		
 		//Sidemenu
 		VBox sidemenu = new VBox();
