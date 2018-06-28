@@ -124,7 +124,7 @@ public class Player {
 			}
 			
 			while (sum >21 && numAces>0) {
-				sum-=10;
+				sum-=9;
 				numAces--;
 			}
 		}

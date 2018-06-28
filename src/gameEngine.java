@@ -390,6 +390,9 @@ public class gameEngine {
 			}
 			System.out.println(i);
 		}
+		
+//		if()
+		
 		if ((playerList.get(i).sum() < host.sum()  && !host.isBusted())|| playerList.get(i).isBusted()||(host.isBlackjack() && !playerList.get(i).isBlackjack()) ) {
 			return 1; //host win
 		}
