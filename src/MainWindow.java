@@ -3,6 +3,7 @@
 import java.util.Collection;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,6 +17,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -30,13 +32,14 @@ import javafx.stage.Stage;
 public class MainWindow extends Application{
 	
 	Button button;
+	static int k =3;
 	static Stage window;
 	static Scene loginScene,roomScene, gameScene;
 	static String username = "hellokitty";
 	static String password = "hithere";
-	static String room[] = {"room1 - BlueCap - 2","RoOm2 - CrystalTiger - 1", "ROOM3 - RedVelvet - 0"};
+	static String room[] = {"room1/BlueCap/2","RoOm2/CrystalTiger/1", "ROOM3/RedVelvet/0"};
 	static ListView<String> roomList;
-	static TableView<String> roomTable;
+	static TableView<roomInfo> roomTable;
 	static String players[]= {"BlackAvocado","GreenLantern","AngryBird"};
 	static String cards[]= {"2S","AC","JH","10D","KD"};
 //	static Collection<Image> imageList;
@@ -149,22 +152,30 @@ public class MainWindow extends Application{
 		roomList.getItems().addAll(room); 
 		GridPane.setConstraints(roomList,0,1);
 		
-		roomTable = new TableView<String>();
 		
-//		TableColumn<String, String> roomNameCol = new TableColumn<String, String>("Room Name");
-//		TableColumn<String, String> hostNameCol = new TableColumn<String, String>("Host User");
-//		TableColumn<String, String> numPlayerCol = new TableColumn<String, String>("Number of Players");
-//		
-//		TableColumn roomNameCol = new TableColumn("Room Name");
-//	    TableColumn hostNameCol = new TableColumn("Host User");
-//	    TableColumn numPlayerCol = new TableColumn("Number of Players");
-//		
-//        roomTable.getColumns().addAll(roomNameCol, hostNameCol, numPlayerCol);
-//        GridPane.setConstraints(roomTable,0,1);
+		
+		TableColumn<roomInfo, String> roomNameCol = new TableColumn<>("Room Name");
+		roomNameCol.setMinWidth(150);
+		roomNameCol.setCellValueFactory(new PropertyValueFactory<>("roomName2"));
+		
+		TableColumn<roomInfo, String> hostNameCol = new TableColumn<>("Host User");
+		hostNameCol.setMinWidth(140);
+		hostNameCol.setCellValueFactory(new PropertyValueFactory<>("HostName"));
+		
+		TableColumn<roomInfo, String> numPlayerCol = new TableColumn<>("Number of Players");
+		numPlayerCol.setMinWidth(120);
+		numPlayerCol.setCellValueFactory(new PropertyValueFactory<>("numPlayer"));
+		
+		roomTable = new TableView<>();
+		roomTable.setMinWidth(420);
+		loadRoom(room);
+		GridPane.setConstraints(roomTable,0,1);
+        roomTable.getColumns().addAll(roomNameCol,hostNameCol, numPlayerCol);
         
 		//Button
 		Button joinRoomButton = new Button("Join room!");
-		GridPane.setConstraints(joinRoomButton,2,0);
+		joinRoomButton.setMinWidth(200);
+//		GridPane.setConstraints(joinRoomButton,2,0);
 		joinRoomButton.setOnAction(e->{
 			String selected;
 			selected = roomList.getSelectionModel().getSelectedItem();
@@ -173,23 +184,49 @@ public class MainWindow extends Application{
 			window.setScene(gameScene);
 		});
 		Button createRoomButton = new Button("Create room!");
-		GridPane.setConstraints(createRoomButton,3,0);
+		createRoomButton.setMinWidth(200);
+//		GridPane.setConstraints(createRoomButton,3,0);
 		createRoomButton.setOnAction(e->{
 			System.out.println("buttonclick: Create!");
 			String roomName = createRoomBox.display();
 			System.out.println(roomName);
 		});
 		Button logoutButton = new Button("Logout");
-		GridPane.setConstraints(logoutButton,4,0);
+		logoutButton.setMinWidth(200);
+//		GridPane.setConstraints(logoutButton,4,0);
 		logoutButton.setOnAction(e->{
 			loginScene = setLoginScene(false);
 			window.setScene(loginScene);
 			System.out.println("Logged Out");
 		});
+		Button refreshButton = new Button("Refresh");
+		refreshButton.setMinWidth(200);
+//		GridPane.setConstraints(logoutButton,4,0);
+		refreshButton.setOnAction(e->{
+			k++;
+			room[2] = "ROOM3/RedVelvet/" + k;
+			loadRoom(room);
+		});
 		
-		grid.getChildren().addAll(nameLabel, roomList , joinRoomButton, createRoomButton,logoutButton);
+		
+		VBox buttonBox = new VBox(20);
+		buttonBox.setAlignment(Pos.TOP_CENTER);
+		
+		GridPane.setConstraints(buttonBox,1,1);
+		buttonBox.getChildren().addAll(joinRoomButton, createRoomButton,refreshButton,logoutButton);
+		
+		grid.getChildren().addAll(nameLabel, roomTable, buttonBox);
 		Scene scene = new Scene(grid);
 		return scene;
+	}
+	
+	private static void loadRoom(String[] roomString) {
+		ObservableList<roomInfo> rooms = FXCollections.observableArrayList();
+		rooms.removeAll();
+		for (int i =0;i<roomString.length;i++) {
+			rooms.add(new roomInfo(roomString[i]));
+		}
+		roomTable.setItems(rooms);
 	}
 	
 	static Scene setGameScene() {
