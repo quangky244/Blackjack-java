@@ -54,7 +54,9 @@ public class MainWindow extends Application{
 	static ObservableList<String[]> deadledCards;
 	static Player host;
 	static List<Player> players = new Vector<Player>();
-//	static TableView<> player1Stat;
+	static TableView<Player> player1Stat;
+	static TableView<Player> player2Stat;
+	static TableView<Player> player3Stat;
 	
 	
 	public static gameEngine game = new gameEngine();
@@ -96,8 +98,10 @@ public class MainWindow extends Application{
 		gameScene = setGameScene();
 		
 		loginScene = setLoginScene(false);
-
-		window.setScene(gameScene);
+			
+			
+		
+		window.setScene(loginScene);
 		window.show();
 		
 		System.out.println("Username from main: "+username);
@@ -290,19 +294,19 @@ public class MainWindow extends Application{
 		
 		//Receive from HOST
 		
-//		String player1 = "quangky";
-//		String player2 = "DoBao";
-//		String player3 = "duckhai";
-//		
-//		String account1 = "2500";
-//		String account2 = "1400";
-//		String account3 = "3700";
-//		
-//		
-//		
-//		players.add(new Player(player1,Integer.parseInt(account1)));
-//		players.add(new Player(player2,Integer.parseInt(account2)));
-//		players.add(new Player(player3,Integer.parseInt(account3)));
+		String player1 = "quangky";
+		String player2 = "DoBao";
+		String player3 = "duckhai";
+		
+		String account1 = "2500";
+		String account2 = "1400";
+		String account3 = "3700";
+		
+		
+		
+		players.add(new Player(player1,Integer.parseInt(account1)));
+		players.add(new Player(player2,Integer.parseInt(account2)));
+		players.add(new Player(player3,Integer.parseInt(account3)));
 		
 		//String format: "request/numberofplayer/host/hostname
 		
@@ -338,7 +342,9 @@ public class MainWindow extends Application{
 		Button hitBtn = new Button("Hit");
 		hitBtn.setMinWidth(100);
 		hitBtn.setMinHeight(10);
-		
+		hitBtn.setOnAction(e->{
+			
+		});
 		Button standBtn = new Button("Stand");
 		standBtn.setMinWidth(100);
 		standBtn.setMinHeight(10);
@@ -349,114 +355,19 @@ public class MainWindow extends Application{
 
 		//CenterMenu
 		// Player Box
-		
+
 		VBox playersBox = new VBox (10);
-
-//		playersBox.getChildren().add(genPlayerBox(host, true));
+		playersBox.getChildren().add(genPlayerBox(host, true));
 		
 		
-//		for (Player p: players) {
-//			if (p.getUsername().equals(username)) {
-//				playersBox.getChildren().add(genPlayerBox(p, false));
-//			} else {
-//				playersBox.getChildren().add(genPlayerBox(p, true));
-//			}
-//		}	
-		
-
-		
-		String husername= "host";
-		String hbet="250";
-		String haccount = "2500";
-		
-		Label hplayerName = new Label("Player: " + husername);
-		Label hplayerBet = new Label("Bet: "+ hbet);
-		Label hplayerAccount = new Label("Account: " + haccount);
-//		Label playerScore = new Label ("Score: "+p.sum() );
-		HBox playerStatBoxh = new HBox (25);
-		playerStatBoxh.getChildren().addAll(hplayerName, hplayerAccount,hplayerBet);
-		
-		GridPane playerCardsh;
-		boolean Backh = true;
-		String[] hostcardArray = {"2S","AC","JH","10D","KD"};
-		if (Backh) {
-			playerCardsh = getCards(hostcardArray);
-		} else {
-			playerCardsh = getCardBacks(hostcardArray.length);
-		}
-		
-		String username1= "ajkfn";
-		String bet1="250";
-		String account1 = "2500";
-		
-		Label playerName1 = new Label("Player: " + username1);
-		Label playerBet1 = new Label("Bet: "+ bet1);
-		Label playerAccount1 = new Label("Account: " + account1);
-//		Label playerScore = new Label ("Score: "+p.sum() );
-		HBox playerStatBox1 = new HBox (25);
-		playerStatBox1.getChildren().addAll(playerName1, playerAccount1,playerBet1);
-		
-		GridPane playerCards1;
-		boolean Back = true;
-		String[] cardArray = {"2S","AC","JH","10D","KD"};
-		if (Back) {
-			playerCards1 = getCards(cardArray);
-		} else {
-			playerCards1 = getCardBacks(cardArray.length);
-		}
-		
-		String username2= "ajkfn";
-		String bet2="250";
-		String account2 = "2500";
-		
-		Label playerName2 = new Label("Player: " + username2);
-		Label playerBet2= new Label("Bet: "+ bet2);
-		Label playerAccount2 = new Label("Account: " + account2);
-//		Label playerScore = new Label ("Score: "+p.sum() );
-		HBox playerStatBox2 = new HBox (25);
-		playerStatBox2.getChildren().addAll(playerName2, playerAccount2,playerBet2);
-		
-		GridPane playerCards2;
-		boolean Back2 = true;
-		String[] cardArray2 = {"2S","AC","JH","10D","KD"};
-		if (Back2) {
-			playerCards2 = getCards(cardArray2);
-		} else {
-			playerCards2 = getCardBacks(cardArray2.length);
-		}
-		
-		String username3= "ajkfn";
-		String bet3="250";
-		String account3 = "2500";
-		
-		Label playerName3 = new Label("Player: " + username3);
-		Label playerBet3 = new Label("Bet: "+ bet3);
-		Label playerAccount3 = new Label("Account: " + account3);
-//		Label playerScore = new Label ("Score: "+p.sum() );
-		HBox playerStatBox3 = new HBox (25);
-		playerStatBox3.getChildren().addAll(playerName3, playerAccount3,playerBet3);
-		
-		GridPane playerCards3;
-		boolean Back3 = false;
-		String[] cardArray3 = {"2S","AC","JH","10D","KD"};
-		if (Back3) {
-			playerCards3 = getCards(cardArray);
-		} else {
-			playerCards3= getCardBacks(cardArray3.length);
-		}
-		
-		
-		
-		playersBox.getChildren().addAll(playerStatBoxh,playerCardsh,playerStatBox1,playerCards1,playerStatBox2,playerCards2,playerStatBox3,playerCards3);
-		
+		for (Player p: players) {
+			if (p.getUsername().equals(username)) {
+				playersBox.getChildren().add(genPlayerBox(p, false));
+			} else {
+				playersBox.getChildren().add(genPlayerBox(p, true));
+			}
+		}		
 		System.out.println("setBoxDone");
-		
-		
-		hitBtn.setOnAction(e->{
-			playerName3.setText("QuangKy");
-			playerBet3.setText("110204");
-		});
-		
 		
 		//BorderPane
 		BorderPane borderPane = new BorderPane();
@@ -465,24 +376,13 @@ public class MainWindow extends Application{
 		borderPane.setLeft(sidemenu);
 		borderPane.setCenter(playersBox);
 		
-		
-		
 		Scene scene = new Scene(borderPane);
 //		scene.
-		
-		
-		
 		return scene;
-		
-		
-		
 		
 	}
 	
-	
-	
-	
-	static Scene setGameSceneHost() {
+static Scene setGameSceneHost() {
 		
 		//Sidemenu
 		VBox sidemenu = new VBox();
@@ -595,8 +495,9 @@ public class MainWindow extends Application{
 		host = game.host;
 		playersBox.getChildren().add(genPlayerBox(host, false));
 		
-		for(Player p : players) {
-			playersBox.getChildren().add(genPlayerBox(p, true));
+		for(int i= 0; i < players.size();i++) {
+			
+			playersBox.getChildren().add(genPlayerBox(players.get(i), true, i));
 		}
 		
 		
@@ -678,15 +579,39 @@ public class MainWindow extends Application{
 		}
 	}
 	
-	static VBox genPlayerBox(Player p, boolean cardBack) {
+	static VBox genPlayerBox(Player p, boolean cardBack, int j) {
 		
-		Label playerName = new Label("Player: " + p.getUsername());
-		Label playerBet = new Label("Bet: "+ p.betAmmount);
-		Label playerAccount = new Label("Account: " + p.getTotalAccount());
-//		Label playerScore = new Label ("Score: "+p.sum() );
+		TableColumn<Player, String> playerNameCol = new TableColumn<>("Player");
+		playerNameCol.setMinWidth(150);
+		playerNameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
+		
+		TableColumn<Player, String> accountCol = new TableColumn<>("Account");
+		accountCol.setMinWidth(140);
+		accountCol.setCellValueFactory(new PropertyValueFactory<>("totalAccount"));
+		
+		TableColumn<Player, String> betCol = new TableColumn<>("Bet");
+		betCol.setMinWidth(120);
+		betCol.setCellValueFactory(new PropertyValueFactory<>("betAmmount"));
 		
 		HBox playerStatBox = new HBox (25);
-		playerStatBox.getChildren().addAll(playerName, playerAccount,playerBet);
+		
+		switch (j) {
+		case 1:
+			player1Stat = new TableView<>();
+			player1Stat.setMinWidth(420);
+			player1Stat.setItems(new ObservableList<Player> p);
+			player1Stat.getColumns().addAll(playerNameCol,accountCol, betCol);
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		default:
+			System.out.println("");
+		}
+		
+		
+		playerStatBox.getChildren().add(player1Stat);
 		
 		GridPane playerCards;
 		if (!cardBack) {
@@ -697,7 +622,7 @@ public class MainWindow extends Application{
 		
 		
 		VBox playerBox = new VBox (10);
-		playerBox.getChildren().addAll(playerStatBox,playerCards);
+		playerBox.getChildren().addAll(playerStat,playerCards);
 		
 		return playerBox;
 	}

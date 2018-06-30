@@ -14,6 +14,10 @@ public class Player  {
 	
 	public List<String> holdingCards = new Vector<String>();
 	
+	public int getBetAmmount() {
+		return betAmmount;
+	}
+	
 	public Player (Player  p){
 		p.username = this.username;
 		this.holdingCards = p.holdingCards;

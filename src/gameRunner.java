@@ -24,6 +24,9 @@ public class gameRunner {
 		game.addBet(player1, 50);
 		game.addBet(player2, 40);
 		
+		
+		
+		
 		Request receive = game.startDeal();
 		
 		System.out.println("Starting Deal");
