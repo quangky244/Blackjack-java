@@ -10,7 +10,6 @@ public class gameRunner {
 		String player2 = "DoBao";
 		List<Player> players = new Vector<Player>();
 		
-		
 		players.add(new Player(player1,2500));
 		players.add(new Player(player2,2500));
 		
@@ -44,6 +43,8 @@ public class gameRunner {
 			numOfPlayer = receive.getNumOfPlayer();
 			break;
 		}
+		
+		
 		Scanner scn;
 		scn = new Scanner(System.in);
 		for (int i=0 ; i< numOfPlayer;i++) {
@@ -87,7 +88,11 @@ public class gameRunner {
 		default:
 			break;
 		}
+		
+		
 		Request req3;
+		
+		
 		Player host = new Player(game.host);
 //		Scanner scn = new Scanner(System.in);
 		while (!game.allPlayerChecked()&&!host.isBusted()) {

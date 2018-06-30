@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Vector;
 
 public class gameEngine {
-	
+
 	static int curCard=0;
 	static int numberOfPlayers;
 	static List<Player> playerList = new Vector<Player>();
@@ -84,8 +84,8 @@ public class gameEngine {
 			if(!host.isBusted()) {
 				req = Request.HOST_HIT_CARD;
 				card = takeOneCard();
-				req.setHitCard(card);
 				host.addCard(card);
+				req.setHitCard(card);
 				return req;
 			}
 			req = Request.HOST_BUSTED;
@@ -345,13 +345,15 @@ public class gameEngine {
 	}
 	private static boolean areAllPlayersReady() {
 		int n=0;
+		System.out.println("GE: playerList size: "+ playerList.size());
 		for (int i=0;i<playerList.size();i++) {
 			if (playerList.get(i).isBet()) {
+			
 				n++;
 				System.out.println(playerList.get(i).getUsername()+" Bet "+ playerList.get(i).betAmmount);
 			}
 		}
-		if (n==numberOfPlayers) {
+		if (n==playerList.size()) {
 			return true;
 		} else {
 			return false;

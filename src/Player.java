@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Vector;
 
-public class Player {
+public class Player  {
 	public String username;
 	public boolean doneHit = false;
 	public int totalAccount=0;
@@ -12,15 +12,58 @@ public class Player {
 	public boolean blackjack=false;
 	private boolean checked = false;
 	
-	Player(Player p){
+	public List<String> holdingCards = new Vector<String>();
+	
+	public Player (Player  p){
 		p.username = this.username;
 		this.holdingCards = p.holdingCards;
 		this.totalAccount = p.totalAccount;
 	}
 	
-	public List<String> holdingCards = new Vector<String>();
+	public Player(String name,int account, boolean randomCards) {
+		username = name;
+		totalAccount = account;
+		holdingCards.add("2C");
+		holdingCards.add("JH");
+		holdingCards.add("10D");
+		holdingCards.add("AS");
+	}
+	
+	public Player(String name,int account) {
+		username = name;
+		totalAccount = account;
+	}
+	public Player (String name,int account, int betAmmount) {
+		username = name;
+		totalAccount = account;
+		this.betAmmount = betAmmount;
+	}
+	
+
 	
 	
+	
+	public String[] getCardArray() {
+		if (holdingCards.size()!=0) {
+			String[] card = new String[holdingCards.size()];
+			
+			for (int i = 0; i< holdingCards.size(); i++) {
+				card[i] = holdingCards.get(i);
+			}
+			return card;
+		}
+		
+		else {
+//			String[] card ={"2S","AC","JH","10D","KD"};
+			String[] card = {};
+			return card;
+		}
+		
+	}
+	
+	public int getTotalAccount () {
+		return totalAccount;
+	}
 	public boolean isBlackjack() {
 		boolean halfjack=false;
 		boolean halfblack=false;
@@ -62,7 +105,7 @@ public class Player {
 		return stat;
 	} 
 	public void printPlayerStat() {
-		System.out.println(username + totalAccount + "\nCards: "+getHoldingCards()+" "+sum()+getStatus());
+		System.out.println(username +" "+ totalAccount + "\nCards: "+getHoldingCards()+" "+sum()+getStatus()+" Bet:"+betAmmount);
 	}
 	
 	public static void main(String[] args) {
@@ -150,15 +193,7 @@ public class Player {
 		}
 		return playerinfo;
 	}
-	public Player(String name,int account) {
-		username = name;
-		totalAccount = account;
-	}
-	public Player(String name,int account, int betAmmount) {
-		username = name;
-		totalAccount = account;
-		this.betAmmount = betAmmount;
-	}
+
 	public void addBet(int betAmmount) {
 		this.betAmmount = betAmmount;
 	}

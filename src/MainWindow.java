@@ -1,6 +1,9 @@
 
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Vector;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -32,21 +35,50 @@ import javafx.stage.Stage;
 public class MainWindow extends Application{
 	
 	Button button;
+	static Request req;
+	static boolean dealed = false;
+	static boolean roomClosed =false;
+	static boolean bustReady = false;
 	static int k =3;
 	static Stage window;
 	static Scene loginScene,roomScene, gameScene;
-	static String username = "hellokitty";
+	static String username = "quangky";
 	static String password = "hithere";
 	static String room[] = {"room1/BlueCap/2","RoOm2/CrystalTiger/1", "ROOM3/RedVelvet/0"};
 	static ListView<String> roomList;
 	static TableView<roomInfo> roomTable;
-	static String players[]= {"BlackAvocado","GreenLantern","AngryBird"};
+	static String players1[]= {"BlackAvocado","GreenLantern","AngryBird"};
 	static String cards[]= {"2S","AC","JH","10D","KD"};
 //	static Collection<Image> imageList;
 	static ObservableList<String[]> deadledCards;
+	static Player host;
+	static List<Player> players = new Vector<Player>();
+	
+	public static gameEngine game = new gameEngine();
 	
 	public static void main(String[] args) {
+		
+		//Recieved from server
+		
+		String player1 = "quangky";
+		String player2 = "DoBao";
+		String player3 = "duckhai";
+		
+		String account1 = "2500";
+		String account2 = "1400";
+		String account3 = "3700";
+		
+		
+		players.add(new Player(player1,Integer.parseInt(account1)));
+		players.add(new Player(player2,Integer.parseInt(account2)));
+		players.add(new Player(player3,Integer.parseInt(account3)));
+		
+		for(Player p : players) {
+			p.printPlayerStat();
+		}
+		
 		launch(args);
+		
 	}
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -56,16 +88,37 @@ public class MainWindow extends Application{
 		
 		window.setTitle("Sign in | Blackjack");
 		window.setWidth(700);
-		window.setHeight(350);
+		window.setHeight(720);
+		
+		gameScene = setGameSceneHost();
 		
 		loginScene = setLoginScene(false);
-		window.setScene(loginScene);
+		
+		
+		
+		window.setScene(gameScene);
 		window.show();
-		
-		
 		
 		System.out.println("Username from main: "+username);
 	}
+	
+//	static Scene setHostScene() {
+//		//Buttons;
+//		Button startButton = new Button("Start Game");
+//		startButton.setOnAction(e -> {});
+//		
+//		Button requestButton = new Button("Request Bet");
+//		requestButton.setOnAction(e -> {});
+//		
+//		Button forceButton = new Button("Force Start");
+//		forceButton.setOnAction(e -> {});
+//		
+//		VBox buttonBox = new VBox(20);
+//		buttonBox.getChildren().addAll(startButton, requestButton, forceButton);
+//		GridPane grid;
+//		Scene scene = new Scene(grid);
+//		return scene;
+//	}
 	
 	static Scene setLoginScene(boolean wrongSomething) {
 		
@@ -230,23 +283,10 @@ public class MainWindow extends Application{
 	}
 	
 	static Scene setGameScene() {
-		
+		host = game.host;
 		//NameLabel
 		Label nameLabel = new Label("You're logged in as: "+ username);
 		GridPane.setConstraints(nameLabel, 0,0);
-		
-		
-		//Topmenu
-		HBox topmenu = new HBox();
-		topmenu.setPadding(new Insets(5));
-		topmenu.setSpacing(15);
-		topmenu.setMinHeight(30);
-		Label hostLab = new Label("Host: "+ username);
-		Label player1lab = new Label("Player1: "+players[0]);
-		Label player2lab = new Label("Player2: "+players[1]);
-		Label player3lab = new Label("Player3: "+players[2]);
-		topmenu.getChildren().addAll(hostLab,player1lab,player2lab,player3lab);
-		
 		
 		//Sidemenu
 		VBox sidemenu = new VBox();
@@ -267,46 +307,439 @@ public class MainWindow extends Application{
 		standBtn.setMinHeight(10);
 		sidemenu.getChildren().addAll(betAmnt, betBtn, hitBtn, standBtn);
 		
-		//Grid
-		GridPane grid = new GridPane();
-		grid.setPadding(new Insets(10,10,10,10));
-		grid.setVgap(8);
-		grid.setHgap(20);
 		
-		grid = getCards(grid);
+		//CenterMenu
+		// Player Box
 		
+		
+		VBox playersBox = new VBox (10);
+		playersBox.getChildren().add(genPlayerBox(host, true));
+		
+		
+		for (Player p: players) {
+			if (p.getUsername().equals(username)) {
+				playersBox.getChildren().add(genPlayerBox(p, false));
+			} else {
+				playersBox.getChildren().add(genPlayerBox(p, true));
+			}
+		}		
+		System.out.println("setBoxDone");
 		
 		//BorderPane
 		BorderPane borderPane = new BorderPane();
 		BorderPane.setMargin(sidemenu, new Insets(10,10,10,10));
-		BorderPane.setMargin(topmenu, new Insets(2,2,2,10));
-		borderPane.setTop(topmenu);
+//		BorderPane.setMargin(topmenu, new Insets(2,2,2,10));
 		borderPane.setLeft(sidemenu);
-		borderPane.setCenter(grid);
+		borderPane.setCenter(playersBox);
 		
 		Scene scene = new Scene(borderPane);
+//		scene.
 		return scene;
 		
 	}
 	
-	static GridPane getCards(GridPane grid) {
-		String imgSrc = "./png/";
-		for (int i=0;i<cards.length;i++) {
-			imgSrc = imgSrc + cards[i] + ".png";
-//			imageList.add(new Image(imgSrc));
+static Scene setGameSceneHost() {
+		
+		//Sidemenu
+		VBox sidemenu = new VBox();
+		
+		sidemenu.setAlignment(Pos.TOP_CENTER);
+		sidemenu.setPadding(new Insets(5));
+		sidemenu.setSpacing(30);
+		
+		Button generateGameBtn = new Button("Close Room");
+		generateGameBtn.setMinWidth(100);
+		generateGameBtn.setMinHeight(40);
+		generateGameBtn.setOnAction(e->{
+			for(Player p : players) {
+				game.addPlayer(p.getUsername(), p.getTotalAccount());
+				p.printPlayerStat();
+			}
 			
-			System.out.println(imgSrc);
+			game.printAllPlayerStatus();
+			
+			System.out.println();
+			AlertBox.display("Game Generated, Room Closed");
+			
+			roomClosed = true;
+			gameScene = setGameSceneHost();
+			window.setScene(gameScene);
+			
+		});
+		
+		Button requestBetBtn = new Button("Request Bet");
+		requestBetBtn.setMinWidth(100);
+		requestBetBtn.setMinHeight(40);
+		requestBetBtn.setOnAction(e->{
+			//Request bet money from users
+			players.get(0).addBet(50);
+			players.get(1).addBet(40);
+			
+			for(Player p : players) {
+				if(p.isBet()) {
+					game.addBet(p.getUsername(), p.betAmmount);
+				}
+			} 
+			
+		});
+		
+		Button refreshBtn = new Button("Refresh");
+		refreshBtn.setMinWidth(100);
+		refreshBtn.setMinHeight(40);
+		refreshBtn.setOnAction(e->{
+		});
+		
+		Button dealBtn = new Button("Start Deal");
+		dealBtn.setMinWidth(100);
+		dealBtn.setMinHeight(40);
+		dealBtn.setOnAction(e->startDealHandler());
+		
+		Button hitBtn = new Button("Hit");
+		hitBtn.setMinWidth(100);
+		hitBtn.setMinHeight(40);
+		hitBtn.setOnAction(e->{
+			req = Request.HOST_HIT;
+			bustingHandler();
+		});
+		
+		Button endGameBtn = new Button("endGame");
+		endGameBtn.setMinWidth(100);
+		endGameBtn.setMinHeight(40);
+		endGameBtn.setOnAction(e->{
+			req = game.endGame();
+			endGameHandler();
+		});
+		
+		TextField bustPlayerInput = new TextField();
+		bustPlayerInput.setMaxWidth(100);
+		bustPlayerInput.setPromptText("bust who?");
+		Button bustBtn = new Button("Bust");
+		bustBtn.setMinWidth(100);
+		bustBtn.setMinHeight(40);
+		bustBtn.setOnAction(e->{
+			boolean found = false;
+			req = Request.HOST_BUST;
+			for (Player p : players) {
+				if (bustPlayerInput.getText().equals(p.getUsername())) {
+					req.setBustPlayer(p.getUsername());
+					found=true;
+				}
+			}
+			if (!found) {
+				AlertBox.display("Please re-enter Player's name");
+			} else {
+				bustingHandler();
+			}
+		});
+		
+		
+//		sidemenu.getChildren().addAll(generateGameBtn,refreshBtn,requestBetBtn ,dealBtn,hitBtn, bustPlayerInput, bustBtn);
+		sidemenu.setAlignment(Pos.CENTER);
+		if (!roomClosed) {
+			sidemenu.getChildren().addAll(generateGameBtn,refreshBtn);
+//			sidemenu.getChildren().addAll(requestBetBtn ,dealBtn);
+		} else if(roomClosed&&!dealed) {
+			sidemenu.getChildren().addAll(requestBetBtn ,dealBtn);
+		} else {
+			sidemenu.getChildren().addAll(hitBtn, bustPlayerInput, bustBtn,endGameBtn);
+			
+		}
+		
+		//CenterMenu
+		// Player Box
+		VBox playersBox = new VBox (10);
+		host = game.host;
+		playersBox.getChildren().add(genPlayerBox(host, false));
+		
+		for(Player p : players) {
+			playersBox.getChildren().add(genPlayerBox(p, true));
+		}
+		
+		
+//		playersBox.getChildren().addAll(player1Box, player2Box, player3Box, player4Box);
+		
+		System.out.println("setBoxDone");
+		
+		//BorderPane
+		BorderPane borderPane = new BorderPane();
+		BorderPane.setMargin(sidemenu, new Insets(10,10,10,10));
+		BorderPane.setMargin(playersBox, new Insets(2,2,2,10));
+		borderPane.setLeft(sidemenu);
+		borderPane.setCenter(playersBox);
+		
+		Scene scene = new Scene(borderPane);
+
+		return scene;
+		
+	}
+
+	static void endGameHandler() {
+		switch (req) {
+		case GAME_ENDED:
+			for (Player p : players) {
+				for (int i=0;i<req.returnAccount.size();i=i+2) {
+					if (p.getUsername() == req.returnAccount.get(i)) {
+						p.totalAccount = Integer.parseInt(req.returnAccount.get(i+1));
+					}
+				}
+			}
+			
+			gameScene = setGameSceneHost();
+			window.setScene(gameScene);			
+			break;
+		default:
+			System.out.println("Something went Wrong");
+		}
+	}
+
+	static void bustingHandler() {
+		req = game.Bust(req);
+		switch (req) {
+		case HOST_HIT_CARD:
+//			host.addCard(req.hitCard);
+			if (host.isBusted()) {
+				AlertBox.display("You are BUSTED");
+			}
+			gameScene = setGameSceneHost();
+			window.setScene(gameScene);
+			break;
+		case HOST_BUST_WIN:
+			for (Player p : players) {
+				if (req.getBustPlayer().equals(p.username)){
+					AlertBox.display("You WON player "+p.getUsername());
+				}
+			}
+			break;
+		case HOST_BUST_LOSE:
+			for (Player p : players) {
+				if (req.getBustPlayer().equals(p.username)){
+					AlertBox.display("Player "+p.getUsername()+" WON");
+					p.setWin();
+				}
+			}
+			break;
+		case HOST_BUST_DRAW:
+			for (Player p : players) {
+				if (req.getBustPlayer().equals(p.username)){
+					AlertBox.display("Player "+p.getUsername()+" CHASE");
+					p.setChase();
+				}
+			}
+			break;
+		case HOST_BUSTED:
+			AlertBox.display("You are Busted");
+			break;
+		default:
+			break;
+		}
+	}
+	
+	static VBox genPlayerBox(Player p, boolean cardBack) {
+		
+		Label playerName = new Label("Player: " + p.getUsername());
+		Label playerBet = new Label("Bet: "+ p.betAmmount);
+		Label playerAccount = new Label("Account: " + p.getTotalAccount());
+//		Label playerScore = new Label ("Score: "+p.sum() );
+		
+		HBox playerStatBox = new HBox (25);
+		playerStatBox.getChildren().addAll(playerName, playerAccount,playerBet);
+		
+		GridPane playerCards;
+		if (!cardBack) {
+			playerCards = getCards(p.getCardArray());
+		} else {
+			playerCards = getCardBacks(p.holdingCards.size());
+		}
+		
+		
+		VBox playerBox = new VBox (10);
+		playerBox.getChildren().addAll(playerStatBox,playerCards);
+		
+		return playerBox;
+	}
+	
+	static GridPane getCardBacks(int numCards) {
+		GridPane grid1 = new GridPane();
+		grid1.setPadding(new Insets(10,10,10,10));
+		grid1.setMinHeight(100);
+		grid1.setVgap(8);
+		grid1.setHgap(20);
+		String imgSrc = "./png/blue_back.png";
+		
+		for (int i=0;i<numCards;i++) {
 			ImageView iv2 = new ImageView();
 	        iv2.setImage(new Image(imgSrc));
-	        iv2.setFitWidth(85);
+	        iv2.setFitWidth(70);
 	        iv2.setPreserveRatio(true);
 	        iv2.setSmooth(true);
 	        iv2.setCache(true);
 	        GridPane.setConstraints(iv2,i,0);
-			grid.getChildren().add(iv2);
+			grid1.getChildren().add(iv2);
+		}
+		return grid1;
+		
+	}
+	
+	static GridPane getCards(String[] cardArray) {
+		GridPane grid1 = new GridPane();
+		grid1.setPadding(new Insets(10,10,10,10));
+		grid1.setMinHeight(100);
+		grid1.setVgap(8);
+		grid1.setHgap(20);
+		
+		String imgSrc = "./png/";
+		for (int i=0;i<cardArray.length;i++) {
+			imgSrc = imgSrc + cardArray[i] + ".png";
+//			imageList.add(new Image(imgSrc));
+			System.out.println(imgSrc);
+			ImageView iv2 = new ImageView();
+	        iv2.setImage(new Image(imgSrc));
+	        iv2.setFitWidth(70);
+	        iv2.setPreserveRatio(true);
+	        iv2.setSmooth(true);
+	        iv2.setCache(true);
+	        GridPane.setConstraints(iv2,i,0);
+			grid1.getChildren().add(iv2);
 			imgSrc = "./png/";
 		}
-		return grid;
+		return grid1;
 	}
+	
+	private static void startDealHandler() {
+		Request receive = game.startDeal();
+		switch (receive) {
+		case WAIT_FOR_PLAYER:
+			//Wait for player to bet or use forceDeal() to ignore the player
+			System.out.println("Players are not Ready. Force start?");
+			if (ConfirmBox.display("Force Start","Players are not Ready. Force start?","Hit it!","Wait a bit")) {
+				startForceDealHandler();
+			}
+			break;
+		case WAIT_FOR_FIRST_DEAL:
+			//give the first 2 cards to players
+			int k = 0;
+			for (Player p : players) {
+				if (p.isBet()) {
+					p.addCard(receive.firstDealCards.get(k)[0]);
+					p.addCard(receive.firstDealCards.get(k)[1]);
+					System.out.println("k= "+k);
+					k++;
+				}
+			}
+			dealed = true;
+			
+			gameScene = setGameSceneHost();
+			window.setScene(gameScene);
+			
+			playerSimulator();
+			
+			if(ConfirmBox.display("Start Busting", "Hey, all players have done picking. Start Busting?", "Okay","Nope")) {
+				startBust();
+			}
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
+	private static void startForceDealHandler() {
+		Request receive = game.forceDeal();
+		switch (receive) {
+		case WAIT_FOR_PLAYER:
+			//Wait for player to bet or use forceDeal() to ignore the player
+			System.out.println("Players are not Ready. Force start?");
+			break;
+		case WAIT_FOR_FIRST_DEAL:
+			//give the first 2 cards to players
+			int k=0;
+			for (Player p : players) {
+				if (p.isBet()) {
+					p.addCard(receive.firstDealCards.get(k)[0]);
+					p.addCard(receive.firstDealCards.get(k)[1]);
+					System.out.println("k= "+k);
+					k++;
+				} else {
+					AlertBox.display(p.getUsername() +" is left out");
+					System.out.println(p.getUsername() +" is left out");
+				}	
+			}
+			dealed = true;
+			for (int i = 0; i < players.size();i++) {
+				if (!players.get(i).isBet()) {
+					players.remove(i);
+				}
+			}
+			gameScene = setGameSceneHost();
+			window.setScene(gameScene);
+			
+			playerSimulator();
+			
+			if(ConfirmBox.display("Start Busting", "Hey, all players have done picking. Start Busting?", "Okay","Nope")) {
+				startBust();
+			}
+			
+			break;
+		default:
+			break;
+		}
+	}
+	static void startBust() {
+		Request req2 = game.startBust();
+		
+		switch (req2) {
+		case BUST_NOT_READY:
+			System.out.println("Bust is not ready");
+			AlertBox.display("Bust is not ready");
+			break;
+		case BUST_READY:
+			System.out.println("Let's get started!");
+			bustReady = true;
+			gameScene = setGameSceneHost();
+			window.setScene(gameScene);
+			break;
+		default:
+			break;
+		}
+		
+		
+		
+	}
+	
+	
+	static void playerSimulator() {
+		for (Player p: players) {
+			boolean hit;
+
+			hit = ConfirmBox.display("Hit or Stand?","    	 Hey " + p.getUsername() + "\nDo you wanna Hit or Stand?", "HIT", "STAND");
+			
+			Request req = Request.HIT_REQUEST;
+			req.setUsername(p.getUsername());
+			
+			while(hit && !p.busted) {
+				req = game.dealHitCard(req);
+				switch (req) {
+				case PLAYER_IS_BUSTED:
+					p.addCard(req.hitCard);
+					AlertBox.display(p.getUsername() +"You are BUSTED");
+					gameScene = setGameSceneHost();
+					window.setScene(gameScene);
+					break;
+				case HIT_REQUEST:
+					p.addCard(req.hitCard);
+					gameScene = setGameSceneHost();
+					window.setScene(gameScene);
+					hit = ConfirmBox.display("Hit or Stand?","    	 Hey " + p.getUsername() + "\nDo you wanna Hit or Stand?", "HIT", "STAND");
+					break;
+				default:
+					break;
+				}
+			}
+			req = game.standRequest(req);	
+		}
+		
+	}
+	
+	
 	
 }
