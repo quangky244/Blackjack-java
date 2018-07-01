@@ -93,7 +93,7 @@ public class gameEngine {
 			
 		case HOST_BUST:
 			if (!host.isBusted()) {
-				System.out.println("GE: bust: "+rqst.getBustPlayer());
+//				System.out.println("GE: bust: "+rqst.getBustPlayer());
 				switch (isWin(rqst.getBustPlayer())) {
 				case 0:
 					req = Request.HOST_BUST_LOSE;
@@ -266,11 +266,11 @@ public class gameEngine {
 			else i++;
 			
 		}
-		System.out.println("Size = "+ playerList.size());
+//		System.out.println("Size = "+ playerList.size());
 		addDeck();
 		shuffle();
 		deal();
-		System.out.println("Size = "+ playerList.size());
+//		System.out.println("Size = "+ playerList.size());
 		
 		req.setNumOfPlayer(playerList.size());
 		for (int j=0; j<playerList.size();j++) {
@@ -307,8 +307,10 @@ public class gameEngine {
 	}
 	
 	public Request addBet(String username, int betAmmount) {
+	
 		for (int i = 0;i<playerList.size();i++) {
-			if (username == playerList.get(i).username) {
+	
+			if (username.equals(playerList.get(i).username)) {
 				playerList.get(i).addBet(betAmmount);
 			}
 		}

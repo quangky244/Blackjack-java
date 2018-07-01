@@ -109,7 +109,8 @@ public class Player  {
 		return stat;
 	} 
 	public void printPlayerStat() {
-		System.out.println(username +" "+ totalAccount + "\nCards: "+getHoldingCards()+" "+sum()+getStatus()+" Bet:"+betAmmount);
+//		System.out.println(username +" "+ totalAccount + "\nCards: "+getHoldingCards()+" "+sum()+getStatus()+" Bet:"+betAmmount);
+		System.out.println(username +" "+ totalAccount + "\nCards: "+getHoldingCards()+" Bet:"+betAmmount);
 	}
 	
 	public static void main(String[] args) {
@@ -204,7 +205,7 @@ public class Player  {
 	public void addCard(String newCard) {
 		holdingCards.add(newCard);
 		if (isBusted()) {
-			System.out.println("PlayerBusted");
+//			System.out.println("PlayerBusted");
 		}
 	}
 	public boolean isBet() {

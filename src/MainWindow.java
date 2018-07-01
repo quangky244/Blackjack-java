@@ -36,6 +36,7 @@ public class MainWindow extends Application{
 	
 	Button button;
 	static Stage window2;
+	static String status;
 	static Request req;
 	static boolean dealed = false;
 	static boolean roomClosed =false;
@@ -50,10 +51,13 @@ public class MainWindow extends Application{
 	static TableView<roomInfo> roomTable;
 	static String players1[]= {"BlackAvocado","GreenLantern","AngryBird"};
 	static String cards[]= {"2S","AC","JH","10D","KD"};
+	static String[] cardsOnHand = {"2S","AC","JH","10D","KD"}; 
+//	static String[] cardsOnHand = new String[5]; 
 //	static Collection<Image> imageList;
 	static ObservableList<String[]> deadledCards;
 	static Player host;
 	static List<Player> players = new Vector<Player>();
+	static String[] array;
 //	static TableView<> player1Stat;
 	
 	
@@ -103,23 +107,6 @@ public class MainWindow extends Application{
 		System.out.println("Username from main: "+username);
 	}
 	
-//	static Scene setHostScene() {
-//		//Buttons;
-//		Button startButton = new Button("Start Game");
-//		startButton.setOnAction(e -> {});
-//		
-//		Button requestButton = new Button("Request Bet");
-//		requestButton.setOnAction(e -> {});
-//		
-//		Button forceButton = new Button("Force Start");
-//		forceButton.setOnAction(e -> {});
-//		
-//		VBox buttonBox = new VBox(20);
-//		buttonBox.getChildren().addAll(startButton, requestButton, forceButton);
-//		GridPane grid;
-//		Scene scene = new Scene(grid);
-//		return scene;
-//	}
 	
 	static Scene setLoginScene(boolean wrongSomething) {
 		
@@ -285,30 +272,76 @@ public class MainWindow extends Application{
 		roomTable.setItems(rooms);
 	}
 	
-	static Scene setGameScene() {
-//		host = game.host;
-		
-		//Receive from HOST
-		
-//		String player1 = "quangky";
-//		String player2 = "DoBao";
-//		String player3 = "duckhai";
-//		
-//		String account1 = "2500";
-//		String account2 = "1400";
-//		String account3 = "3700";
-//		
-//		
-//		
-//		players.add(new Player(player1,Integer.parseInt(account1)));
-//		players.add(new Player(player2,Integer.parseInt(account2)));
-//		players.add(new Player(player3,Integer.parseInt(account3)));
-		
-		//String format: "request/numberofplayer/host/hostname
-		
-		String receivedFromServer = "HIT/2/host/na/quangky/3D/duckhai/na";
 	
-		//NameLabel
+	static String[] parseToArray(String a) {
+		String temp="";
+		int k=0;
+		int arrayIndex=0;
+		for (int i = 0;i<a.length();i++) {
+			if (a.charAt(i) == '/') {
+				k++;
+			} 
+		}
+		String[] ret = new String[k];
+		for (int i = 0;i<a.length();i++) {
+			temp+=a.charAt(i);
+			if (a.charAt(i) == '/') {
+				temp = temp.replace(temp.substring(temp.length()-1), "");
+				ret[arrayIndex] = temp;
+				arrayIndex++;
+				temp = "";
+			} 
+		}
+		return ret;
+	}
+	static String getOrder(String a) {
+		String temp="";
+		
+		for (int i = 0;i<a.length();i++) {
+			temp += a.charAt(i);
+			if (a.charAt(i) == '/') {
+				temp = temp.replace(temp.substring(temp.length()-1), "");
+				System.out.println("temp = "+temp);
+				return temp;
+			} 
+		}
+		return "none";
+	}
+	
+	static String hostname= "";
+	static String hbet="";
+	static String hostacc = "";
+	static String p1name= "";
+	static String p1bet="";
+	static String p1acc = "";
+	static String p2name= "";
+	static String p2bet="";
+	static String p2acc = "";
+	static String p3name ="" ;
+	static String p3bet ="";
+	static String p3acc ="";
+	
+	static Label hplayerName,hplayerBet,hplayerAccount;
+	static Label playerName1,playerBet1,playerAccount1;
+	static Label playerName2,playerBet2,playerAccount2;
+	static Label playerName3,playerBet3,playerAccount3;
+	
+	static 	int numofCards=0;
+	static int myNumber = 0;
+	static String output;
+	static String input="";
+	static String Str = "";
+	static String account = "5000";
+	static String hostNumofCards ="2";
+	static String p1NumofCards="3";
+	static String p2NumofCards="2";
+	static String p3NumofCards="1";
+	static GridPane playerCards1;
+	static GridPane playerCards2;
+	static GridPane playerCards3;
+	
+	static Scene setGameScene() {
+		
 		Label nameLabel = new Label("You're logged in as: "+ username);
 		GridPane.setConstraints(nameLabel, 0,0);
 		
@@ -351,135 +384,204 @@ public class MainWindow extends Application{
 		// Player Box
 		
 		VBox playersBox = new VBox (10);
+		
+		//FROM HOST
 
-//		playersBox.getChildren().add(genPlayerBox(host, true));
-		
-		
-//		for (Player p: players) {
-//			if (p.getUsername().equals(username)) {
-//				playersBox.getChildren().add(genPlayerBox(p, false));
-//			} else {
-//				playersBox.getChildren().add(genPlayerBox(p, true));
-//			}
-//		}	
-		
+		String strFromHost = "FIRSTUPDATE/hostname/hostacc/quangky/p1bet/p1acc/p2name/p2bet/p2acc/p3name/p3bet/p3acc/";
+		String UpdateFromHost = "UPDATE/p1NumOfCards/p2NumOfCards/p3NumOfCards/";
+		String HitStrFromHost = "HITCARD/username/ 4C/";
+		String FirstCardsFromHost = "FIRSTCARDS/username/3D/AH/";
+		String HitOfferFromHost= "HITOFFER/";
+		String BetRequest = "BETREQUEST/";
+		String BustAlert = "BUST/WIN(LOSE, CHASE)/";		
 
+		//TO HOST
+
+		String BetStrToHost = "BET\n username\n Account\n BetAmmount\n";
+		String HitStrToHost = "HIT\n username\n";
+		String StandStrToHost = "STAND\n username\n";
 		
-		String husername= "host";
-		String hbet="250";
-		String haccount = "2500";
+		Str = "FIRSTUPDATE/hostname/hostacc/quangky/p1bet/p1acc/p2name/p2bet/p2acc/p3name/p3bet/p3acc/";
 		
-		Label hplayerName = new Label("Player: " + husername);
-		Label hplayerBet = new Label("Bet: "+ hbet);
-		Label hplayerAccount = new Label("Account: " + haccount);
-//		Label playerScore = new Label ("Score: "+p.sum() );
+		switch (getOrder(Str)){
+		case "BETREQUEST":
+
+			System.out.println("Please Enter your Bet ammount: ");
+			input = InputBox.display("Enter your Bet Ammount");
+			output = "BET/"+username+"/"+account+"/"+input+"/";
+			
+			break;
+		case "FIRSTUPDATE":
+			array = parseToArray(Str);
+			
+			hostname = array[1];
+			hostacc = array[2];
+			p1name= array[3];
+			p1acc = array[4];
+			p1bet = array[5];
+			
+			if(array.length<=10) {
+				p2name= array[6];
+				p2acc = array[7];
+				p2bet = array[8];
+			}  else { 
+				p2name= array[6];
+				p2acc = array[7];
+				p2bet = array[8];
+				p3name= array[6];
+				p3acc = array[7];
+				p3bet = array[8];
+			}
+			if(username!= "") {
+				if(p1name!= "" && username.equals(p1name)) {
+					myNumber = 1;
+					System.out.println("haha");
+				} else if (p2name!= "" && username.equals(p2name)) {
+					myNumber =2;
+				} else if (p3name!= "" && username.equals(p3name)) {
+					myNumber =3;
+				}
+			}
+			break;
+		case "UPDATE":
+			array = parseToArray(Str);
+			hostNumofCards = array[1];
+			p1NumofCards = array[2];
+			
+			if (array.length==2) {
+				p2NumofCards = array[3];
+			} else {
+				p2NumofCards = array[3];
+				p3NumofCards = array[4];
+			}
+			
+			break;
+		case "FIRSTCARDS":
+			array = parseToArray(Str);
+			cardsOnHand[1] = array[2];
+			cardsOnHand[2] = array[3];
+			numofCards = 2;
+			
+			break;
+		case "HITOFFER":
+//				scn = new Scanner (System.in);
+			System.out.println("You want to HIT? (Y,N)");
+			
+			if (ConfirmBox.display("HIT OFFER", "Do you want to HIT or STAND?","Hit", "Stand")) {
+				output = "HIT\n"+ username +"\n";
+			} else {
+				output = "STAND\n"+ username +"\n";
+			}
+						
+			break;
+		case "HITCARDS":
+			array = parseToArray(Str);
+			cardsOnHand[numofCards] = array[2];
+			numofCards++;
+			
+			break;
+		case "BUST":
+			array = parseToArray(Str);
+			status = array[1];
+			System.out.println("You "+ status);
+			break;
+		default:
+			break;
+		}
+		
+		// PLayer Host
+		hplayerName = new Label("Player: " + hostname);
+		hplayerBet = new Label("Bet: "+ hbet);
+		hplayerAccount = new Label("Account: " + hostacc);
 		HBox playerStatBoxh = new HBox (25);
 		playerStatBoxh.getChildren().addAll(hplayerName, hplayerAccount,hplayerBet);
 		
-		GridPane playerCardsh;
-		boolean Backh = true;
-		String[] hostcardArray = {"2S","AC","JH","10D","KD"};
-		if (Backh) {
-			playerCardsh = getCards(hostcardArray);
-		} else {
-			playerCardsh = getCardBacks(hostcardArray.length);
-		}
+		GridPane hostCardBox;
+		hostCardBox = getCardBacks(Integer.parseInt(hostNumofCards));
 		
-		String username1= "ajkfn";
-		String bet1="250";
-		String account1 = "2500";
+		// PLayer1
 		
-		Label playerName1 = new Label("Player: " + username1);
-		Label playerBet1 = new Label("Bet: "+ bet1);
-		Label playerAccount1 = new Label("Account: " + account1);
-//		Label playerScore = new Label ("Score: "+p.sum() );
+		playerName1 = new Label("Player: " + p1name);
+		playerBet1 = new Label("Bet: "+ p1bet);
+		playerAccount1 = new Label("Account: " + p1acc);
 		HBox playerStatBox1 = new HBox (25);
 		playerStatBox1.getChildren().addAll(playerName1, playerAccount1,playerBet1);
 		
-		GridPane playerCards1;
-		boolean Back = true;
-		String[] cardArray = {"2S","AC","JH","10D","KD"};
-		if (Back) {
-			playerCards1 = getCards(cardArray);
+		if (myNumber==1) {
+			playerCards1 = getCards(cardsOnHand,numofCards);
 		} else {
-			playerCards1 = getCardBacks(cardArray.length);
+			playerCards1 = getCardBacks(Integer.parseInt(p1NumofCards));
 		}
 		
-		String username2= "ajkfn";
-		String bet2="250";
-		String account2 = "2500";
+		// PLayer2
 		
-		Label playerName2 = new Label("Player: " + username2);
-		Label playerBet2= new Label("Bet: "+ bet2);
-		Label playerAccount2 = new Label("Account: " + account2);
-//		Label playerScore = new Label ("Score: "+p.sum() );
+		playerName2 = new Label("Player: " + p2name);
+		playerBet2= new Label("Bet: "+ p2bet);
+		playerAccount2 = new Label("Account: " + p2acc);
 		HBox playerStatBox2 = new HBox (25);
 		playerStatBox2.getChildren().addAll(playerName2, playerAccount2,playerBet2);
 		
-		GridPane playerCards2;
-		boolean Back2 = true;
-		String[] cardArray2 = {"2S","AC","JH","10D","KD"};
-		if (Back2) {
-			playerCards2 = getCards(cardArray2);
+		if (myNumber==2) {
+			playerCards2 = getCards(cardsOnHand,numofCards);
 		} else {
-			playerCards2 = getCardBacks(cardArray2.length);
+			playerCards2 = getCardBacks(Integer.parseInt(p2NumofCards));
 		}
+	
+		// PLayer3
 		
-		String username3= "ajkfn";
-		String bet3="250";
-		String account3 = "2500";
-		
-		Label playerName3 = new Label("Player: " + username3);
-		Label playerBet3 = new Label("Bet: "+ bet3);
-		Label playerAccount3 = new Label("Account: " + account3);
-//		Label playerScore = new Label ("Score: "+p.sum() );
+		playerName3 = new Label("Player: " + p3name);
+		playerBet3 = new Label("Bet: "+ p3bet);
+		playerAccount3 = new Label("Account: " + p3acc);
 		HBox playerStatBox3 = new HBox (25);
 		playerStatBox3.getChildren().addAll(playerName3, playerAccount3,playerBet3);
 		
-		GridPane playerCards3;
-		boolean Back3 = false;
-		String[] cardArray3 = {"2S","AC","JH","10D","KD"};
-		if (Back3) {
-			playerCards3 = getCards(cardArray);
+		
+
+		if (myNumber==3) {
+			playerCards3 = getCards(cardsOnHand,numofCards);
 		} else {
-			playerCards3= getCardBacks(cardArray3.length);
+			playerCards3= getCardBacks(Integer.parseInt(p3NumofCards));
 		}
-		
-		
-		
-		playersBox.getChildren().addAll(playerStatBoxh,playerCardsh,playerStatBox1,playerCards1,playerStatBox2,playerCards2,playerStatBox3,playerCards3);
+	 
+		playersBox.getChildren().addAll(playerStatBoxh,hostCardBox,playerStatBox1,playerCards1,playerStatBox2,playerCards2,playerStatBox3,playerCards3);
 		
 		System.out.println("setBoxDone");
 		
+		
+		// ChangeValuefunction
 		
 		hitBtn.setOnAction(e->{
 			playerName3.setText("QuangKy");
 			playerBet3.setText("110204");
 		});
 		
-		
 		//BorderPane
 		BorderPane borderPane = new BorderPane();
 		BorderPane.setMargin(sidemenu, new Insets(10,10,10,10));
-//		BorderPane.setMargin(topmenu, new Insets(2,2,2,10));
+
 		borderPane.setLeft(sidemenu);
 		borderPane.setCenter(playersBox);
-		
-		
-		
+
 		Scene scene = new Scene(borderPane);
-//		scene.
-		
-		
-		
+
 		return scene;
-		
-		
-		
+	}
+
+	static void updatePlayerLabels() {
+		hplayerName.setText("Player: " + hostname);
+		hplayerBet.setText("Bet: "+ hbet);
+		hplayerAccount.setText("Account: " + hostacc);
+		playerName1.setText("Player: " + p1name);
+		playerBet1.setText("Bet: "+ p1bet);
+		playerAccount1.setText("Account: " + p1acc);
+		playerName2.setText("Player: " + p2name);
+		playerBet2.setText("Bet: "+ p2bet);
+		playerAccount2.setText("Account: " + p2acc);
+		playerName3.setText("Player: " + p3name);
+		playerBet3.setText("Bet: "+ p3bet);
+		playerAccount3.setText("Account: " + p3acc);
 		
 	}
-	
-	
 	
 	
 	static Scene setGameSceneHost() {
@@ -629,7 +731,8 @@ public class MainWindow extends Application{
 			}
 			
 			gameScene = setGameSceneHost();
-			window.setScene(gameScene);			
+			window.setScene(gameScene);	
+
 			break;
 		default:
 			System.out.println("Something went Wrong");
@@ -690,7 +793,7 @@ public class MainWindow extends Application{
 		
 		GridPane playerCards;
 		if (!cardBack) {
-			playerCards = getCards(p.getCardArray());
+			playerCards = getCards(p.getCardArray(),p.getCardArray().length);
 		} else {
 			playerCards = getCardBacks(p.holdingCards.size());
 		}
@@ -724,7 +827,7 @@ public class MainWindow extends Application{
 		
 	}
 	
-	static GridPane getCards(String[] cardArray) {
+	static GridPane getCards(String[] cardArray,int numofCards) {
 		GridPane grid1 = new GridPane();
 		grid1.setPadding(new Insets(10,10,10,10));
 		grid1.setMinHeight(100);
@@ -732,7 +835,7 @@ public class MainWindow extends Application{
 		grid1.setHgap(20);
 		
 		String imgSrc = "./png/";
-		for (int i=0;i<cardArray.length;i++) {
+		for (int i=0;i<numofCards;i++) {
 			imgSrc = imgSrc + cardArray[i] + ".png";
 //			imageList.add(new Image(imgSrc));
 			System.out.println(imgSrc);
@@ -857,9 +960,7 @@ public class MainWindow extends Application{
 		default:
 			break;
 		}
-		
-		
-		
+
 	}
 	
 	static boolean playerSimulator(String user) {
