@@ -9,7 +9,7 @@ import java.util.Scanner;
 import java.util.Vector;
 
 public class gameRunner {
-	public static gameEngine game = new gameEngine();
+	public static gameEngine game = new gameEngine("hostname", 2500);
 	static String[] array;
 	static List<Player> players = new Vector<Player>();
 	public static void main(String[] args) throws IOException {

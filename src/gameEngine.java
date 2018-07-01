@@ -11,7 +11,7 @@ public class gameEngine {
 	static int numberOfPlayers;
 	static List<Player> playerList = new Vector<Player>();
 	static List<String> deckList = new Vector<String>();
-	Player host = new Player("host",2500);
+	Player host; 
 	
 	static String[] deck = {
 			"2S","3S","4S","5S","6S","7S","8S","9S","10S","JS","QS","KS","AS",
@@ -21,6 +21,11 @@ public class gameEngine {
 	};
 	
 	
+	public gameEngine(String usrname, int account) {
+		// TODO Auto-generated constructor stub
+		host = new Player(usrname, account);
+	}
+
 	public void main(String[] args) {
 
 		
@@ -74,6 +79,8 @@ public class gameEngine {
 //		
 //		return Request;
 //	}
+	
+	
 	
 	public Request Bust(Request rqst) {
 		Request req;
